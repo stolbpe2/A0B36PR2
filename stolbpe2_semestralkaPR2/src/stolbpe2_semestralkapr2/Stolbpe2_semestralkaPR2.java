@@ -4,6 +4,9 @@
  */
 package stolbpe2_semestralkapr2;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Punk
@@ -14,6 +17,16 @@ public class Stolbpe2_semestralkaPR2 {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        //ClientGUI gui = new ClientGUI();
+        //gui.setVisible(true);
+        
+        while(true){
+            try {
+                Client klient= new Client();
+            } catch (Exception ex) {
+               System.out.println("chyba");
+            }
+        Server server= new Server();
     }
+}
 }
