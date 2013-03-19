@@ -4,10 +4,8 @@
  */
 package stolbpe2_semestralkapr2;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Scanner;
@@ -17,21 +15,22 @@ import java.util.Scanner;
  * @author Punk
  */
 public class Client {
- public static void main(String[] args) throws Exception {
-    InetAddress address = InetAddress.getByName(null);
-    Socket socket = new Socket();
-    try {
-    socket = new Socket(address, 5678);
-          //BufferedReader in = new BufferedReader (new InputStreamReader( socket.getInputStream()));
-        Scanner in=new Scanner(System.in);
-      PrintWriter out = new PrintWriter( new OutputStreamWriter( socket.getOutputStream()), true);
-      for(int i = 0; i < 10; i ++) {
-        out.println(i);
-       Thread.sleep(200);
-      }
-      out.println("//QUIT");
-    } finally {
-      socket.close();
-    }
-  }
-}
+public static void main(String args[]){  
+try{
+InetAddress address = InetAddress.getByName(null);
+Socket s = new Socket(address,5678); 
+OutputStream os = s.getOutputStream();  
+ObjectOutputStream oos = new ObjectOutputStream(os); 
+Scanner sc=new Scanner(System.in);
+String temp="";
+do{
+temp=sc.next(); 
+oos.writeObject(new Message(temp,"petak"));
+}while((!temp.equals("//QUIT")));
+oos.writeObject(new Message("//QUIT"));
+oos.close();  
+os.close();  
+s.close();  
+}catch(Exception e){System.out.println(e);}  
+}  
+}     

@@ -31,7 +31,13 @@ public class ClientGUI extends javax.swing.JFrame {
         jToggleButton1 = new javax.swing.JToggleButton();
         jButton1 = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
+        try {
+            jTextArea2 =(javax.swing.JTextArea)java.beans.Beans.instantiate(getClass().getClassLoader(), "stolbpe2_semestralkapr2.ClientGUI_jTextArea2");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(40, 40, 40));
@@ -49,10 +55,6 @@ public class ClientGUI extends javax.swing.JFrame {
 
         jButton1.setText("jButton1");
 
-        jTextArea2.setEditable(false);
-        jTextArea2.setBackground(new java.awt.Color(100, 100, 100));
-        jTextArea2.setColumns(20);
-        jTextArea2.setRows(5);
         jScrollPane3.setViewportView(jTextArea2);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
