@@ -4,3 +4,5 @@
 *.jar
 *.war
 *.ear
+/stolbpe2_semestralkaPR2/nbproject/private/
+/stolbpe2_semestralkaPR2/build/
