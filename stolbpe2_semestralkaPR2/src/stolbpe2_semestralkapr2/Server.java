@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -19,19 +20,13 @@ import java.util.List;
  */
 public class Server {
 
+    static List spojeni = new ArrayList(10);
+
     public static void main(String[] args) throws IOException {
         ServerSocket s = new ServerSocket(5678);
-        List docasny = new ArrayList();
-        List spojeni = new ArrayList();
         System.out.println("Server pripraven");
         try {
             while (true) {
-                for (int i = 0; i < spojeni.size(); i++) {
-                    if (spojeni.get(i) == false) {
-                        docasny.add(spojeni.get(i));
-                    }
-                    spojeni.removeAll(docasny);
-                }
                 Socket socket = s.accept();
                 try {
                     spojeni.add(new ServeConnection(socket));
@@ -44,8 +39,31 @@ public class Server {
             s.close();
         }
     }
+
+    public void RefreshConnection() {
+        List docasny = new ArrayList();
+        for (int i = 0; i < spojeni.size(); i++) {
+            if (spojeni.get(i) == false) {
+                docasny.add(spojeni.get(i));
+            }
+            spojeni.removeAll(docasny);
+        }
+for(int i=0;i<127;i++){       
+try {
+String adresa = "192.168.0."+i;
+InetAddress address = InetAddress.getByName(adresa);
+Socket s = new Socket(address,5678); 
+ServeConnection serve=new ServeConnection(s);
+spojeni.add(serve);
+}catch(Exception e){System.out.println(e);}  
+}  
+        
+        
+    
+}
 }
 
+// Obsluha spojení, vlákna
 class ServeConnection extends Thread {
 
     private Socket socket;
@@ -55,7 +73,6 @@ class ServeConnection extends Thread {
     boolean active = false;
 
     public ServeConnection(Socket s) throws IOException {
-        socket = s;
         in = new ObjectInputStream(socket.getInputStream());
         out = new ObjectOutputStream(socket.getOutputStream());
         start();
@@ -78,6 +95,7 @@ class ServeConnection extends Thread {
                 } catch (ClassNotFoundException ex) {
                     System.out.println("nelze precist");
                 }
+ //               Stolbpe2_semestralkaPR2.addMsg(prectena);
                 System.out.println(prectena.obsah + "   odesilatel: " + prectena.odesilatel);
                 if (prectena.obsah.equals("//QUIT")) {
                     System.out.println("//Konec");
