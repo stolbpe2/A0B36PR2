@@ -10,7 +10,7 @@ import java.util.ArrayList;
  *
  * @author Punk
  */
-public class History {
+public  class History {
     ArrayList<Message> seznam = new  ArrayList<>();
     public History(){
         
