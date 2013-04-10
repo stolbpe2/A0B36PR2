@@ -5,8 +5,12 @@
 package stolbpe2_semestralkapr2;
 
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -38,63 +42,43 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         window.setVisible(true);
         window.setSize(400, 500);
     }
+    
+    
 
-   //samotný program
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    //samotný program
     public Stolbpe2_semestralkaPR2() {
+
         final JTextArea zadavadlo = new JTextArea();
-        zadavadlo.setEditable(true);
-        JButton Odesli = new JButton("Odesli");
-        JButton spojeni = new JButton("Spojeni");
+        final JTextArea IP = new JTextArea("192.168.0.100");
         final JTextArea list = new JTextArea();
-                list.setMinimumSize(new Dimension(100,200));
-        list.setEditable(false);
+        IP.setPreferredSize(new Dimension(100,15));
+        //zadavadlo.setPreferredSize(new Dimension(600,600));
+        list.setPreferredSize(new Dimension(400,400));
+        //zadavadlo.setEditable(true);
+        JButton Odesli = new JButton("Send");
+        JButton spojeni = new JButton("Connect");
+        JButton serverEnable = new JButton("I`m Server");
+        JButton OK = new JButton("OK");
         
-//obsluha spojení        
-        spojeni.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                list.append("\n spojeno");
-                //server.ObnovSpojeni();
-            }
-        });
-//obsluha odesílání
-        Odesli.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                list.append("\n"+zadavadlo.getText());
-                
-                //server.Posli("zadavadlo.getText());
-                zadavadlo.setText(null);
-            }
-        });
+        list.setMinimumSize(new Dimension(100, 200));
+        list.setEditable(false);
+
+
+        JPanel spoj = new JPanel();
+        JPanel zadavani = new JPanel();
+        zadavadlo.setPreferredSize(new Dimension(300, 200));
+        Odesli.setPreferredSize(new Dimension(70, 90));
+        zadavani.add(zadavadlo);
+        zadavani.add(Odesli);
+        spoj.add(IP);
+        spoj.add(OK);
+        spoj.add(serverEnable);
+        spoj.add(spojeni);
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, WIDTH));
+        panel.add(spoj);
         panel.add(list);
-        panel.add(Odesli);
-        panel.add(zadavadlo);
-        panel.add(spojeni);
+        panel.add(zadavani);
 
 
 
@@ -104,5 +88,60 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         this.setTitle("Messenger Stolbpe2");
         this.setResizable(false);
         this.setLocationRelativeTo(null);
+        
+        
+              Server server=new Server();
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+         //nastavení směrovacího serveru      
+        OK.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            }
+        });
+        //obsluha spojení        
+        spojeni.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                list.append("\n spojeno");
+                //server.ObnovSpojeni();
+            }
+        });
+        //spuštění směrovacího serveru       
+        serverEnable.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            }
+        });
+//obsluha odesílání
+        Odesli.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                list.append("\n" + zadavadlo.getText());
+
+                //server.Send(zadavadlo.getText());
+
+                zadavadlo.setText(null);
+            }
+        });
+        
+
     }
+    
 }
