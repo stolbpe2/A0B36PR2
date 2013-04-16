@@ -4,6 +4,8 @@
  */
 package stolbpe2_semestralkapr2;
 
+import java.net.InetAddress;
+
 /**
  *
  * @author Punk
@@ -11,5 +13,7 @@ package stolbpe2_semestralkapr2;
 public interface Spojeni{
   public void Odesli(String s);
   public void Ukonci();
+  public InetAddress Adresa();
+  public boolean Stav();
     
 }

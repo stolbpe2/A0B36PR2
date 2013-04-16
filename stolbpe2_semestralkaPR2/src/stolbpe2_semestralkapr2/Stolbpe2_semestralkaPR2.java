@@ -5,17 +5,20 @@
 package stolbpe2_semestralkapr2;
 
 import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -25,10 +28,19 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 public class Stolbpe2_semestralkaPR2 extends JFrame {
 
-    /**
-     * @param args the command line arguments
-     */
+    static void Zobraz(Message m) {
+        list.append("\n" + m.odesilatel + ":  " + m.obsah);
+        JScrollBar vertical = slist.getVerticalScrollBar();
+        vertical.setValue(vertical.getMaximum());
+    }
+
+    static void Seznam(String s) {
+        seznam.setText(s);
+    }
+    static JTextArea list = new JTextArea();
     static History History = new History();
+    static JTextArea seznam = new JTextArea();
+    static JScrollPane slist = new JScrollPane(list);
 
     public static void main(String[] args) {
 
@@ -42,42 +54,46 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         window.setVisible(true);
         window.setSize(400, 500);
     }
-    
-    
 
     //samotný program
     public Stolbpe2_semestralkaPR2() {
 
         final JTextArea zadavadlo = new JTextArea();
-        final JTextArea IP = new JTextArea("192.168.0.100");
-        final JTextArea list = new JTextArea();
-        IP.setPreferredSize(new Dimension(100,15));
-        //zadavadlo.setPreferredSize(new Dimension(600,600));
-        list.setPreferredSize(new Dimension(400,400));
-        //zadavadlo.setEditable(true);
+        zadavadlo.setEditable(true);
+        JScrollPane szadavadlo = new JScrollPane(zadavadlo);
+        szadavadlo.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        szadavadlo.setPreferredSize(new Dimension(280, 90));
+        final JTextArea IP = new JTextArea("127.0.0.1");
+        IP.setPreferredSize(new Dimension(200, 15));
+        list.setLineWrap(true);
+         slist.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        slist.setPreferredSize(new Dimension(280, 300));
+        seznam.setPreferredSize(new Dimension(100, 300));
+        seznam.setEditable(false);
+        zadavadlo.setLineWrap(true);
+        
         JButton Odesli = new JButton("Send");
         JButton spojeni = new JButton("Connect");
-        JButton serverEnable = new JButton("I`m Server");
-        JButton OK = new JButton("OK");
-        
-        list.setMinimumSize(new Dimension(100, 200));
+        JButton kontakty = new JButton("ObnovSeznam");
+
         list.setEditable(false);
 
 
         JPanel spoj = new JPanel();
         JPanel zadavani = new JPanel();
-        zadavadlo.setPreferredSize(new Dimension(300, 200));
-        Odesli.setPreferredSize(new Dimension(70, 90));
-        zadavani.add(zadavadlo);
+        JPanel seznamy = new JPanel();
+        seznamy.add(slist);
+        seznamy.add(seznam);
+        Odesli.setPreferredSize(new Dimension(100, 70));
+        zadavani.add(szadavadlo);
         zadavani.add(Odesli);
         spoj.add(IP);
-        spoj.add(OK);
-        spoj.add(serverEnable);
         spoj.add(spojeni);
+        spoj.add(kontakty);
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, WIDTH));
         panel.add(spoj);
-        panel.add(list);
+        panel.add(seznamy);
         panel.add(zadavani);
 
 
@@ -88,43 +104,36 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         this.setTitle("Messenger Stolbpe2");
         this.setResizable(false);
         this.setLocationRelativeTo(null);
-        
-        
-              Server server=new Server();
 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-         //nastavení směrovacího serveru      
-        OK.addActionListener(new ActionListener() {
+
+        final Server server = new Server();
+        server.execute();
+
+
+
+
+
+
+        //obsluha kontaktů       
+        kontakty.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                seznam.setText(server.seznamSpojeni());
             }
         });
         //obsluha spojení        
         spojeni.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                list.append("\n spojeno");
-                //server.ObnovSpojeni();
+                try {
+                    server.pridejClienta(InetAddress.getByName(IP.getText()));
+                } catch (UnknownHostException ex) {
+                    Logger.getLogger(Stolbpe2_semestralkaPR2.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
         //spuštění směrovacího serveru       
-        serverEnable.addActionListener(new ActionListener() {
+        kontakty.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
             }
@@ -133,15 +142,11 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         Odesli.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                list.append("\n" + zadavadlo.getText());
+                //list.append("\n" + zadavadlo.getText());
 
-                //server.Send(zadavadlo.getText());
-
+                server.Odesli(zadavadlo.getText());
                 zadavadlo.setText(null);
             }
         });
-        
-
     }
-    
 }
