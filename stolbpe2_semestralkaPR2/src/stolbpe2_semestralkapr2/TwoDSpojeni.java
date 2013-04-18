@@ -10,7 +10,7 @@ import java.net.InetAddress;
  *
  * @author Punk
  */
-public class TwoDSpojeni implements Spojeni {
+public class TwoDSpojeni{
 ThreadServer sthread;
 ThreadClient cthread;
 InetAddress adresa;
@@ -19,6 +19,7 @@ this.sthread=s;
 Stolbpe2_semestralkaPR2.Zobraz(new Message("zakladam serverove vlakno, spoustim klientske"));
 this.cthread= new ThreadClient(s.Adresa()); 
 adresa=s.Adresa();
+this.cthread.start();
 }
 
 public TwoDSpojeni(InetAddress IP){
@@ -28,35 +29,42 @@ this.cthread= new ThreadClient(IP);
 
 public TwoDSpojeni(ThreadClient s){
 this.cthread=s;
-adresa=s.Adresa();
+adresa=cthread.Adresa();
 s.Odesli("chci se pripojit");
         
 }
 
 public void priradServer(ThreadServer s){
 this.sthread=s;
-Stolbpe2_semestralkaPR2.Zobraz(new Message("Přiřazuji server"));
 
 }
 
-    @Override
+
     public void Odesli(String s) {
     cthread.Odesli(s);    
     }
 
-    @Override
+    public void Odesli(InetAddress a) {
+    cthread.Odesli(a);    
+    }
+
+    
     public void Ukonci() {
         sthread.Ukonci();
         cthread.Ukonci();
     }
 
-    @Override
+
     public InetAddress Adresa() {
         return adresa;
     }
 
-    @Override
+
     public boolean Stav() {
        return cthread.Stav();
+    }
+
+    void PriradClient(InetAddress adresa) {
+        cthread=new ThreadClient(adresa);
     }
 }

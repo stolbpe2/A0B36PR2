@@ -7,7 +7,6 @@ package stolbpe2_semestralkapr2;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -18,7 +17,7 @@ import java.util.logging.Logger;
  *
  * @author Punk
  */
-class ThreadServer extends Thread implements Spojeni{
+class ThreadServer extends Thread{
 
     private Socket socket;
     private InputStream is;
@@ -27,12 +26,14 @@ class ThreadServer extends Thread implements Spojeni{
     Message prectena = new Message("Chyba");
 
     public ThreadServer(Socket s){
+        //System.err.println("jsem nove serverove vlakno");
         socket=s;
         try {
             is= s.getInputStream();
             ois = new ObjectInputStream(is);
+            //System.err.println("server: povedlo se otevřít komunikaci");
         } catch (IOException ex) {
-            Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("nepovedlo se otevřít komunikaci");
         }
         start();
     }
@@ -69,8 +70,12 @@ class ThreadServer extends Thread implements Spojeni{
                    
                     prectena = (Message) precteny;             
                 if (!prectena.obsah.equals("//QUIT")) {
+                    if(prectena.odesilatel.equals("intIP")){
+                        
+                    }else{
                    Stolbpe2_semestralkaPR2.Zobraz(new Message(prectena.obsah,socket.getInetAddress().toString()));
-                }else{
+                    }
+                    }else{
                    Ukonci();
                    break;
                 }
@@ -81,7 +86,6 @@ class ThreadServer extends Thread implements Spojeni{
     
 }
 
-    @Override
     public void Ukonci(){
         try {
             socket.close();
@@ -89,19 +93,21 @@ class ThreadServer extends Thread implements Spojeni{
             Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    @Override
+ 
     public void Odesli(String s){
         throw new UnsupportedOperationException("Jsem Server");
     }
-    
-    @Override
+
     public InetAddress Adresa(){
     return socket.getInetAddress();
     }
 
-    @Override
+
     public boolean Stav() {
         return socket.isConnected();
+    }
+
+    public void Odesli(InetAddress a) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
         }

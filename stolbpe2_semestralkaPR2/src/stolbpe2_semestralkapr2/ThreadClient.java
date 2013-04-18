@@ -5,13 +5,10 @@
 package stolbpe2_semestralkapr2;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,17 +16,17 @@ import java.util.logging.Logger;
  *
  * @author Punk
  */
-public class ThreadClient extends Thread implements Spojeni {
+public class ThreadClient extends Thread {
 
     InetAddress IP = null;
-    InetAddress address;
     Socket s;
     OutputStream os;
     ObjectOutputStream oos;
+    boolean funguje=true;
 
     public ThreadClient(InetAddress adresa) {
         IP=adresa;
-        Stolbpe2_semestralkaPR2.Zobraz(new Message(IP.getHostAddress()));
+        //Stolbpe2_semestralkaPR2.Zobraz(new Message(IP.getHostAddress()));
         this.start();
 
     }
@@ -40,46 +37,58 @@ public class ThreadClient extends Thread implements Spojeni {
             s = new Socket(IP, 5678);
             os = s.getOutputStream();
             oos = new ObjectOutputStream(os);
-            System.err.println("pripojuji se k "+IP.getHostAddress()+" a povedlo se mi to");
+            funguje=true;
+           // System.err.println("pripojuji se k "+IP.getHostAddress()+" a povedlo se mi to");
         } catch (IOException e) {
          System.err.println("pripojuji se k"+IP.getHostAddress()+"a nepovedlo se mi to");
+        funguje=false;
         }
 
     }
 
-    @Override
     public void Ukonci() {
         try {
             oos.writeObject(new Message("//QUIT"));
             oos.close();
             os.close();
             s.close();
+            funguje=false;
         } catch (IOException ex) {
             Logger.getLogger(ThreadClient.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    @Override
+
     public synchronized void Odesli(String s) {
-        Stolbpe2_semestralkaPR2.Zobraz(new Message(s, "Odesílám:"));
         try {
             oos.writeObject((Object) new Message(s));
-        } catch (IOException ex) {
+        } catch (IOException | NullPointerException e) {
             System.err.println("nepovedlo se odeslat");
+            funguje=false;
         }
     }
 
-    @Override
+    
+ 
+    public synchronized void Odesli(InetAddress a) {
+        Stolbpe2_semestralkaPR2.Zobraz(new Message(a.getHostAddress(), "Odesílám adresu "));
+        try {
+            oos.writeObject((Object) new Message(a));
+        } catch (IOException | NullPointerException e) {
+            System.err.println("nepovedlo se odeslat");
+            funguje=false;
+        }
+    } 
+     
+
     public InetAddress Adresa() {
         return IP;
     }
 
-    @Override
+
     public boolean Stav() {
-        try {
-            return s.getInetAddress().isReachable(100);
-        } catch (IOException ex) {
-           return false;
-        }
+       
+            return funguje;
+        
     }
 }

@@ -5,6 +5,7 @@
 package stolbpe2_semestralkapr2;
 
 import java.io.Serializable;
+import java.net.InetAddress;
 
 /**
  *
@@ -15,6 +16,7 @@ public enum Typ {Error, Message, Info};
 Typ druh;
 String obsah;
 String odesilatel;
+InetAddress IP=null;
 
 public Message(String m,String o){
 this.obsah=m;
@@ -26,5 +28,11 @@ public Message(String m){
 this.obsah=m;
 this.odesilatel="program";
 //druh=Typ.values()[2];
+}
+
+public Message(InetAddress a){
+this.obsah=a.getHostAddress();
+this.odesilatel="intIP";
+IP=a;
 }
 }
