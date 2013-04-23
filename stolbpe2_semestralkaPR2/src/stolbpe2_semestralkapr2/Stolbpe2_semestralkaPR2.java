@@ -30,7 +30,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class Stolbpe2_semestralkaPR2 extends JFrame {
 
     static void Zobraz(Message m) {
-        list.append("\n" + m.odesilatel + ":  " + m.obsah);
+        list.append( m.odesilatel + ":  " + m.obsah+"\n");
         JScrollBar vertical = slist.getVerticalScrollBar();
         vertical.setValue(vertical.getMaximum()+1);
         vertical.setValue(vertical.getValue()+1);
@@ -71,9 +71,9 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         szadavadlo.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         szadavadlo.setPreferredSize(new Dimension(280, 90));
         final JTextField IP = new JTextField("127.000.000.001");
-        IP.setPreferredSize(new Dimension(120, 20));
+        IP.setPreferredSize(new Dimension(95, 20));
         final JTextField myIP = new JTextField("");
-        myIP.setPreferredSize(new Dimension(100, 20));
+        myIP.setPreferredSize(new Dimension(120, 20));
         list.setLineWrap(true);
         slist.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         slist.setPreferredSize(new Dimension(280, 300));
@@ -96,7 +96,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         JPanel seznamy = new JPanel();
         seznamy.add(slist);
         seznamy.add(sseznam);
-        Odesli.setPreferredSize(new Dimension(100, 70));
+        Odesli.setPreferredSize(new Dimension(80, 90));
         zadavani.add(szadavadlo);
         zadavani.add(Odesli);
         spoj.add(IP);
@@ -116,7 +116,8 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         this.setContentPane(panel);
         this.pack();
         this.setTitle("Messenger Stolbpe2");
-        this.setResizable(false);
+        //this.setResizable(false);
+        this.setMinimumSize(new Dimension(420,500));
         this.setLocationRelativeTo(null);
 
 
@@ -126,7 +127,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 seznam.setText(server.seznamSpojeni());
                 server.PredejSpojeni();
-                myIP.setText("moje IP: " + server.GetMyIP());
+                myIP.setText("my IP: " + server.GetMyIP());
 
             }
         });

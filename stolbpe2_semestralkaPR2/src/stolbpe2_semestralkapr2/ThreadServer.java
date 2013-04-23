@@ -26,23 +26,15 @@ class ThreadServer extends Thread{
     Message prectena = new Message("Chyba");
 
     public ThreadServer(Socket s){
-        //System.err.println("jsem nove serverove vlakno");
+        System.err.println("jsem nove serverove vlakno");
         socket=s;
-        try {
-            is= s.getInputStream();
-            ois = new ObjectInputStream(is);
-            //System.err.println("server: povedlo se otevřít komunikaci");
-        } catch (IOException ex) {
-            System.err.println("nepovedlo se otevřít komunikaci");
-        }
         start();
+        
     }
     
     public ThreadServer(InetAddress so){
         try {
             socket = new Socket(so,5678);
-            is= socket.getInputStream();
-            ois = new ObjectInputStream(socket.getInputStream());
             start();
         } catch (UnknownHostException ex) {
             Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
@@ -58,12 +50,20 @@ class ThreadServer extends Thread{
 
     @Override
     public synchronized void start() {
+         try {
+            is= socket.getInputStream();
+            ois = new ObjectInputStream(is);
+           System.err.println("server: povedlo se otevřít komunikaci");
+        } catch (IOException ex) {
+            System.err.println("nepovedlo se otevřít komunikaci");
+        }
        
            while (true) {
                 
                 Object precteny = null;               
             try {
                 precteny = ois.readObject();
+                Stolbpe2_semestralkaPR2.pridejClienta(this.Adresa());
             } catch (    IOException | ClassNotFoundException ex) {
                 Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
             }

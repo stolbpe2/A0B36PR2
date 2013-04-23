@@ -22,13 +22,26 @@ import javax.swing.SwingWorker;
 public final class Server extends SwingWorker {
 
     static List<TwoDSpojeni> polespojeni = new ArrayList();
+    static List<InetAddress> zakadresy = new ArrayList();
     ServerSocket s;
+
+    
+    
+    
+    
 
     public void pridejClienta(InetAddress adresa) {
         Pridej a = new Pridej(adresa);
     }
 
     public Server() {
+        try {
+            //zakadresy.add(InetAddress.getByName("127.0.0.1"));
+            zakadresy.add(InetAddress.getByName("255.255.255.255"));
+            
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+        }
         try {
             s = new ServerSocket(5678);
         } catch (IOException ex) {
@@ -37,7 +50,7 @@ public final class Server extends SwingWorker {
         this.execute();
     }
 
-    public void PredejSpojeni() {
+    public static void PredejSpojeni() {
         List<TwoDSpojeni> bezi;
         for (int i = 0; i < polespojeni.size(); i++) {
             bezi = polespojeni.subList(0, i);
@@ -62,16 +75,16 @@ public final class Server extends SwingWorker {
     }
 
     public static void UdrzSpojeni() {
-//        L
-        for (int i = 0; i < polespojeni.size(); i++) {
-            try {
-                if (!polespojeni.get(i).Stav()) {
-                    polespojeni.remove(i);
-                    i--;
-                }
-            } catch (NullPointerException e) {
-            }
-        }
+
+//        for (int i = 0; i < polespojeni.size(); i++) {
+//            try {
+//                if (!polespojeni.get(i).Stav()) {
+//                    polespojeni.remove(i);
+//                    i--;
+//                }
+//            } catch (NullPointerException e) {
+//            }
+//        }
 
     }
 
@@ -85,7 +98,7 @@ public final class Server extends SwingWorker {
         }
     }
 
-    public String GetMyIP() {
+    public static String GetMyIP() {
         try {
             return InetAddress.getLocalHost().getHostAddress().toString();
         } catch (UnknownHostException ex) {
@@ -105,13 +118,16 @@ public final class Server extends SwingWorker {
         @Override
         public final void run() {
             boolean obsahuje = false;
+            if(!zakadresy.contains(adresa)){
             for (int i = 0; i < polespojeni.size(); i++) {
-                if (polespojeni.get(i).Adresa().getAddress().equals(adresa.getAddress())) {
+                System.err.println("porovnavam:"+polespojeni.get(i).Adresa().getHostAddress() +" a " +adresa.getHostAddress());
+                if (polespojeni.get(i).Adresa().getHostAddress().equals(adresa.getHostAddress())) {
                     obsahuje = true;
                 }
             }
             if (!obsahuje) {
                 polespojeni.add(new TwoDSpojeni(adresa));
+            }
             }
             Stolbpe2_semestralkaPR2.Seznam();
 
@@ -122,30 +138,31 @@ public final class Server extends SwingWorker {
     protected Object doInBackground() {
         Socket socket = null;
         ThreadServer docasnespojeni = null;
-        System.err.println("doinbackground");
         while (true) {
             try {
 
-                System.err.println("akceptuji spojení");
-                docasnespojeni = new ThreadServer(s.accept());
-                System.err.println("povedlo se prijmout spojeni");
+
+                polespojeni.add(new TwoDSpojeni( new ThreadServer(s.accept()),true));
+                System.err.println("vkládaám nové spojení");
+
             } catch (IOException ex) {
-                System.err.println("nepovedlo se prijmout spojeni");
+
             }
-            System.err.println("jdu vkladat");
+
             boolean vlozeno = false;
-            for (int i = 0; i <= polespojeni.size(); i++) {
-                if (polespojeni.get(i).Adresa().equals(docasnespojeni.Adresa())) {
-                    polespojeni.get(i).priradServer(docasnespojeni);
-                    System.err.println("Prirazeno ke klientovi");
-                    vlozeno = true;
-                }
-                if (!vlozeno) {
-                    TwoDSpojeni a = new TwoDSpojeni(docasnespojeni);
-                    polespojeni.add(a);
-                    System.err.println("Vytvoreno nove TwoDSpojeni");
-                }
-            }
+//            for (int i = 0; i <= polespojeni.size(); i++) {
+//                if (polespojeni.get(i).Adresa().equals(docasnespojeni.Adresa())) {
+//                    polespojeni.get(i).priradServer(docasnespojeni);
+//
+//                    vlozeno = true;
+//                }
+//                if (!vlozeno) {
+//            System.err.println("vkládaám nové spojení");
+//                    TwoDSpojeni a = new TwoDSpojeni(docasnespojeni);
+//                    polespojeni.add(a);
+
+//                }
+//            }
         }
     }
 }

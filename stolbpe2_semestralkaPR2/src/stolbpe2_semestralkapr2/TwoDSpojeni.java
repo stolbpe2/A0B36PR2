@@ -5,6 +5,9 @@
 package stolbpe2_semestralkapr2;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -14,7 +17,7 @@ public class TwoDSpojeni{
 ThreadServer sthread;
 ThreadClient cthread;
 InetAddress adresa;
-public TwoDSpojeni(ThreadServer s){
+public TwoDSpojeni(ThreadServer s,boolean server){
 this.sthread=s;
 Stolbpe2_semestralkaPR2.Zobraz(new Message("zakladam serverove vlakno, spoustim klientske"));
 this.cthread= new ThreadClient(s.Adresa()); 
@@ -45,7 +48,14 @@ this.sthread=s;
     }
 
     public void Odesli(InetAddress a) {
-    cthread.Odesli(a);    
+        String moje = Server.GetMyIP().toString() ;
+
+    if (
+            (a.getHostAddress().equals("127.0.0.1"))&(a.getHostAddress().equals(moje)))  
+            
+            {
+     
+    }else{cthread.Odesli(a);}
     }
 
     

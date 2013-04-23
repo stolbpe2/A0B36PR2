@@ -63,7 +63,7 @@ public class ThreadClient extends Thread {
         try {
             oos.writeObject((Object) new Message(s));
         } catch (IOException | NullPointerException e) {
-            System.err.println("nepovedlo se odeslat");
+            Stolbpe2_semestralkaPR2.Zobraz(new Message("nepodarilo se mi odeslat"+ s+" na "+ IP.getHostAddress(),"PROGRAM"));
             funguje=false;
         }
     }
