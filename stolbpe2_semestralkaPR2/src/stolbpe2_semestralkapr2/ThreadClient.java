@@ -27,18 +27,19 @@ public class ThreadClient extends Thread {
     public ThreadClient(InetAddress adresa) {
         IP=adresa;
         //Stolbpe2_semestralkaPR2.Zobraz(new Message(IP.getHostAddress()));
-        this.start();
+
 
     }
 
     @Override
     public final void start() {
+        System.err.println("jsem nový klient");
         try {
             s = new Socket(IP, 5678);
             os = s.getOutputStream();
             oos = new ObjectOutputStream(os);
             funguje=true;
-           // System.err.println("pripojuji se k "+IP.getHostAddress()+" a povedlo se mi to");
+           System.err.println("pripojuji se k "+IP.getHostAddress()+" a povedlo se mi to");
         } catch (IOException e) {
          System.err.println("pripojuji se k"+IP.getHostAddress()+"a nepovedlo se mi to");
         funguje=false;

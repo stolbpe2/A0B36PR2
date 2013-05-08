@@ -5,12 +5,15 @@
 package stolbpe2_semestralkapr2;
 
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -30,16 +33,16 @@ import javax.swing.UnsupportedLookAndFeelException;
 public class Stolbpe2_semestralkaPR2 extends JFrame {
 
     static void Zobraz(Message m) {
-        list.append( m.odesilatel + ":  " + m.obsah+"\n");
+        list.append(m.odesilatel + ":  " + m.obsah + "\n");
         JScrollBar vertical = slist.getVerticalScrollBar();
-        vertical.setValue(vertical.getMaximum()+1);
-        vertical.setValue(vertical.getValue()+1);
+        vertical.setValue(vertical.getMaximum() + 1);
+        vertical.setValue(vertical.getValue() + 1);
     }
 
     static void Seznam() {
         seznam.setText(server.seznamSpojeni());
     }
-    static JTextArea list = new JTextArea();
+    static final JTextArea list = new JTextArea();
     static History History = new History();
     static JTextArea seznam = new JTextArea();
     static JScrollPane slist = new JScrollPane(list);
@@ -55,11 +58,12 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         Stolbpe2_semestralkaPR2 window = new Stolbpe2_semestralkaPR2();
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setVisible(true);
-        window.setSize(400, 500);
+        window.setSize(100, 100);
+        server.execute();
     }
 
     static void pridejClienta(InetAddress IP) {
-        server.pridejClienta(IP);
+        server.Pridej(IP);
     }
 
     //samotný program
@@ -69,56 +73,110 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         zadavadlo.setEditable(true);
         JScrollPane szadavadlo = new JScrollPane(zadavadlo);
         szadavadlo.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        szadavadlo.setPreferredSize(new Dimension(280, 90));
-        final JTextField IP = new JTextField("127.000.000.001");
-        IP.setPreferredSize(new Dimension(95, 20));
+        //szadavadlo.setPreferredSize(new Dimension(280, 90));
+        final JTextField IP = new JTextField("127.0.0.1");
+        IP.setPreferredSize(new Dimension(90, 20));
         final JTextField myIP = new JTextField("");
-        myIP.setPreferredSize(new Dimension(120, 20));
+        myIP.setPreferredSize(new Dimension(115, 20));
         list.setLineWrap(true);
         slist.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        slist.setPreferredSize(new Dimension(280, 300));
         seznam.setEditable(false);
         JScrollPane sseznam = new JScrollPane(seznam);
         sseznam.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        sseznam.setPreferredSize(new Dimension(100, 300));
+        sseznam.setPreferredSize(new Dimension(110, 90));
+
         myIP.setEditable(false);
         zadavadlo.setLineWrap(true);
 
         final JButton Odesli = new JButton("Send");
         JButton spojeni = new JButton("Connect");
         JButton kontakty = new JButton("Obnov");
-
+        myIP.setText("myIP:" + Server.GetMyIP());
         list.setEditable(false);
-
+        this.pack();
+        this.setTitle("Messenger Stolbpe2");
+        this.setMinimumSize(new Dimension(410, 200));
+        this.setLocationRelativeTo(null);
 
         JPanel spoj = new JPanel();
-        JPanel zadavani = new JPanel();
-        JPanel seznamy = new JPanel();
-        seznamy.add(slist);
-        seznamy.add(sseznam);
-        Odesli.setPreferredSize(new Dimension(80, 90));
-        zadavani.add(szadavadlo);
-        zadavani.add(Odesli);
         spoj.add(IP);
-        myIP.setText("my IP: " + server.GetMyIP());
         spoj.add(myIP);
         spoj.add(spojeni);
         spoj.add(kontakty);
         JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, WIDTH));
-        panel.add(spoj);
-        panel.add(seznamy);
-        panel.add(zadavani);
-
-
-
-
         this.setContentPane(panel);
-        this.pack();
-        this.setTitle("Messenger Stolbpe2");
-        //this.setResizable(false);
-        this.setMinimumSize(new Dimension(420,500));
-        this.setLocationRelativeTo(null);
+        panel.setLayout(new GridBagLayout());
+
+//        panel.setLayout(new BoxLayout(panel, WIDTH));
+//        JPanel zadavani = new JPanel();
+//        JPanel seznamy = new JPanel();
+//        seznamy.add(slist);
+//        seznamy.add(sseznam);
+//        zadavani.add(szadavadlo);
+//        zadavani.add(Odesli);
+//        panel.add(spoj);
+//        panel.add(seznamy);
+//        panel.add(zadavani);
+
+        GridBagConstraints a = new GridBagConstraints();
+        a.fill = GridBagConstraints.HORIZONTAL;
+        a.weightx = 100;
+        a.gridx = 0;
+        a.gridy = 0;
+        a.gridwidth = 4;
+        panel.add(spoj, a);
+
+        GridBagConstraints b = new GridBagConstraints();
+        b.fill = GridBagConstraints.BOTH;
+        b.gridx = 0;
+        b.gridy = 2;
+        b.gridwidth = 3;
+        b.gridheight = 1;
+        b.weightx = 30000;
+        b.weighty = 5000;
+        panel.add(slist,b);
+        
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.VERTICAL;
+        c.weightx = 100;
+        c.gridx = 3;
+        c.gridy = 2;
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        c.weightx = 30000;
+        c.weighty = 3000;
+        panel.add(sseznam,c);
+                
+                GridBagConstraints d = new GridBagConstraints();
+        d.fill = GridBagConstraints.BOTH;
+        d.weightx = 100;
+        d.gridx = 0;
+        d.gridy = 3;
+        d.gridwidth = 1;
+        d.gridheight = 1;
+        d.weightx = 3;
+        d.weighty = 3;
+        panel.add(szadavadlo,d);
+        
+        GridBagConstraints e = new GridBagConstraints();
+        e.fill = GridBagConstraints.VERTICAL;
+        e.weightx = 100;
+        e.gridx = 3;
+        e.gridy = 3;
+        e.gridwidth = 1;
+        e.gridheight = 1;
+        e.weightx = 3;
+        e.weighty = 3;
+        panel.add(Odesli,e);
+
+
+
+
+
+
+
+
+
 
 
         //obsluha kontaktů       
@@ -126,8 +184,8 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 seznam.setText(server.seznamSpojeni());
-                server.PredejSpojeni();
-                myIP.setText("my IP: " + server.GetMyIP());
+                Server.PredejSpojeni();
+                myIP.setText("my IP: " + Server.GetMyIP());
 
             }
         });
@@ -135,10 +193,11 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         spojeni.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                String t = IP.getText();
                 try {
-                    server.pridejClienta(InetAddress.getByName(IP.getText()));
+                    server.Pridej(InetAddress.getByName(t));
                 } catch (UnknownHostException ex) {
-                    Logger.getLogger(Stolbpe2_semestralkaPR2.class.getName()).log(Level.SEVERE, null, ex);
+                    Stolbpe2_semestralkaPR2.Zobraz(new Message("nepovedlo se připojit k IP" + t, "ERROR"));
                 }
             }
         });
