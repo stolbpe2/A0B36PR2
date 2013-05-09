@@ -7,16 +7,15 @@ package stolbpe2_semestralkapr2;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -35,8 +34,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
     static void Zobraz(Message m) {
         list.append(m.odesilatel + ":  " + m.obsah + "\n");
         JScrollBar vertical = slist.getVerticalScrollBar();
-        vertical.setValue(vertical.getMaximum() + 1);
-        vertical.setValue(vertical.getValue() + 1);
+        vertical.setValue(vertical.getMaximum() );
     }
 
     static void Seznam() {
@@ -73,11 +71,10 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         zadavadlo.setEditable(true);
         JScrollPane szadavadlo = new JScrollPane(zadavadlo);
         szadavadlo.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        //szadavadlo.setPreferredSize(new Dimension(280, 90));
         final JTextField IP = new JTextField("127.0.0.1");
-        IP.setPreferredSize(new Dimension(90, 20));
+        IP.setPreferredSize(new Dimension(95, 20));
         final JTextField myIP = new JTextField("");
-        myIP.setPreferredSize(new Dimension(115, 20));
+        myIP.setPreferredSize(new Dimension(95, 20));
         list.setLineWrap(true);
         slist.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         seznam.setEditable(false);
@@ -88,18 +85,22 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         myIP.setEditable(false);
         zadavadlo.setLineWrap(true);
 
-        final JButton Odesli = new JButton("Send");
+        final JButton Odesli = new JButton("    SEND!    ");
+        Odesli.setSize(20, 90);
         JButton spojeni = new JButton("Connect");
         JButton kontakty = new JButton("Obnov");
-        myIP.setText("myIP:" + Server.GetMyIP());
+        JLabel majIP=new JLabel("moje IP:");
+        myIP.setText(Server.GetMyIP());
         list.setEditable(false);
         this.pack();
-        this.setTitle("Messenger Stolbpe2");
-        this.setMinimumSize(new Dimension(410, 200));
+        this.setTitle("Messenger stolbpe2");
+        this.setMinimumSize(new Dimension(430, 220));
         this.setLocationRelativeTo(null);
+
 
         JPanel spoj = new JPanel();
         spoj.add(IP);
+        spoj.add(majIP);
         spoj.add(myIP);
         spoj.add(spojeni);
         spoj.add(kontakty);
@@ -107,16 +108,6 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         this.setContentPane(panel);
         panel.setLayout(new GridBagLayout());
 
-//        panel.setLayout(new BoxLayout(panel, WIDTH));
-//        JPanel zadavani = new JPanel();
-//        JPanel seznamy = new JPanel();
-//        seznamy.add(slist);
-//        seznamy.add(sseznam);
-//        zadavani.add(szadavadlo);
-//        zadavani.add(Odesli);
-//        panel.add(spoj);
-//        panel.add(seznamy);
-//        panel.add(zadavani);
 
         GridBagConstraints a = new GridBagConstraints();
         a.fill = GridBagConstraints.HORIZONTAL;
@@ -170,7 +161,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         panel.add(Odesli,e);
 
 
-
+        this.setSize(new Dimension(430, 240));
 
 
 
@@ -185,7 +176,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 seznam.setText(server.seznamSpojeni());
                 Server.PredejSpojeni();
-                myIP.setText("my IP: " + Server.GetMyIP());
+                myIP.setText(Server.GetMyIP());
 
             }
         });
@@ -211,11 +202,37 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         Odesli.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //list.append("\n" + zadavadlo.getText());
-
                 server.Odesli(zadavadlo.getText());
                 zadavadlo.setText(null);
             }
         });
+    
+ zadavadlo.addKeyListener(new KeyListener(){
+    @Override 
+    public void keyReleased(KeyEvent e) {
+        if(e.getKeyCode()==10){
+         if(e.getModifiers()==0){
+         String text=zadavadlo.getText();
+         if(text.length()>0){
+         text=text.substring(0,text.length()-1);
+         }
+         server.Odesli(text);
+                zadavadlo.setText(null); 
+         }else{
+         zadavadlo.append("\n");
+         }
+        }
     }
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+                
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+               
+            }
+    });
+}
 }
