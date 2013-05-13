@@ -11,8 +11,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -31,6 +34,8 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 public class Stolbpe2_semestralkaPR2 extends JFrame {
 
+    private static boolean spustenserver = false;
+
     static void Zobraz(Message m) {
         list.append(m.odesilatel + ":  " + m.obsah + "\n");
         JScrollBar vertical = slist.getVerticalScrollBar();
@@ -44,7 +49,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
     static History History = new History();
     static JTextArea seznam = new JTextArea();
     static JScrollPane slist = new JScrollPane(list);
-    static Server server = new Server();
+    static Server server = null;
 
     public static void main(String[] args) {
 
@@ -57,11 +62,11 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setVisible(true);
         window.setSize(100, 100);
-        server.execute();
+        //server.execute();
     }
 
-    static void pridejClienta(InetAddress IP) {
-        server.Pridej(IP);
+    static void pridejClienta(InetAddress IP, int intsocket) {
+        server.Pridej(IP, intsocket);
     }
 
     //samotný program
@@ -74,6 +79,8 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         szadavadlo.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         final JTextField IP = new JTextField("127.0.0.1");
         IP.setPreferredSize(new Dimension(95, 20));
+        final JTextField spojport = new JTextField("5678");
+        spojport.setPreferredSize(new Dimension(40, 20));
         final JTextField myIP = new JTextField("");
         myIP.setPreferredSize(new Dimension(95, 20));
         list.setLineWrap(true);
@@ -82,6 +89,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         JScrollPane sseznam = new JScrollPane(seznam);
         sseznam.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         sseznam.setPreferredSize(new Dimension(110, 90));
+        boolean spustenserever = false;
 
         myIP.setEditable(false);
         zadavadlo.setLineWrap(true);
@@ -95,37 +103,23 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         list.setEditable(false);
         this.pack();
         this.setTitle("Messenger stolbpe2");
-        this.setMinimumSize(new Dimension(430, 220));
+        this.setMinimumSize(new Dimension(400, 230));
         this.setLocationRelativeTo(null);
-        
-        
-        JButton Port=new JButton("Spust server s portem:");
-        JTextField zPort=new JTextField("5678");
-        JPanel Pport=new JPanel();
-        Pport.add(Port);
-        Pport.add(zPort);
-        zPort.setPreferredSize(new Dimension(60, 20));
+
 
 
         JPanel spoj = new JPanel();
         spoj.add(IP);
+        spoj.add(spojport);
         spoj.add(majIP);
         spoj.add(myIP);
         spoj.add(spojeni);
-        spoj.add(kontakty);
         final JPanel panel = new JPanel();
         this.setContentPane(panel);
         panel.setLayout(new GridBagLayout());
 
 
-        GridBagConstraints z = new GridBagConstraints();
-        z.fill = GridBagConstraints.HORIZONTAL;
-        z.weightx = 100;
-        z.gridx = 0;
-        z.gridy = 0;
-        z.gridwidth = 4;
-        panel.add(Pport, z);
-        
+
         GridBagConstraints a = new GridBagConstraints();
         a.fill = GridBagConstraints.HORIZONTAL;
         a.weightx = 100;
@@ -178,7 +172,11 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         panel.add(Odesli, e);
 
 
-        this.setSize(new Dimension(430, 240));
+
+
+
+
+
 
 
         //obsluha kontaktů       
@@ -198,13 +196,29 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String t = IP.getText();
                 try {
-                    server.Pridej(InetAddress.getByName(t));
-                } catch (UnknownHostException ex) {
-                    Stolbpe2_semestralkaPR2.Zobraz(new Message("nepovedlo se připojit k IP" + t, "ERROR"));
+                    if (spustenserver) {
+                        if(Server.getSocket()==Integer.parseInt(spojport.getText())){
+                        Server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
+                        }else{
+                        server=new Server(Integer.parseInt(spojport.getText()));
+                        server.execute();
+                        Stolbpe2_semestralkaPR2.Zobraz(new Message("spouštím server na portu: " + spojport.getText()));
+                        Server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
+                        }
+                    } else {
+                        Stolbpe2_semestralkaPR2.Zobraz(new Message("spouštím server na portu: " + spojport.getText()));
+                        server = new Server(Integer.parseInt(spojport.getText()));
+                        server.execute();
+                        spustenserver = true;
+                        Server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
+                    }
+                
+                } catch (IOException ex) {
+                    Stolbpe2_semestralkaPR2.Zobraz(new Message("nepovedlo se připojit k IP " + t, " možná špatný socket?"));
                 }
             }
         });
-       
+
 //obsluha odesílání
         Odesli.addActionListener(new ActionListener() {
             @Override
