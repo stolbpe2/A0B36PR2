@@ -34,7 +34,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
     static void Zobraz(Message m) {
         list.append(m.odesilatel + ":  " + m.obsah + "\n");
         JScrollBar vertical = slist.getVerticalScrollBar();
-        vertical.setValue(vertical.getMaximum() );
+        vertical.setValue(vertical.getMaximum());
     }
 
     static void Seznam() {
@@ -67,6 +67,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
     //samotný program
     public Stolbpe2_semestralkaPR2() {
 
+
         final JTextArea zadavadlo = new JTextArea();
         zadavadlo.setEditable(true);
         JScrollPane szadavadlo = new JScrollPane(zadavadlo);
@@ -89,13 +90,21 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         Odesli.setSize(20, 90);
         JButton spojeni = new JButton("Connect");
         JButton kontakty = new JButton("Obnov");
-        JLabel majIP=new JLabel("moje IP:");
+        JLabel majIP = new JLabel("moje IP:");
         myIP.setText(Server.GetMyIP());
         list.setEditable(false);
         this.pack();
         this.setTitle("Messenger stolbpe2");
         this.setMinimumSize(new Dimension(430, 220));
         this.setLocationRelativeTo(null);
+        
+        
+        JButton Port=new JButton("Spust server s portem:");
+        JTextField zPort=new JTextField("5678");
+        JPanel Pport=new JPanel();
+        Pport.add(Port);
+        Pport.add(zPort);
+        zPort.setPreferredSize(new Dimension(60, 20));
 
 
         JPanel spoj = new JPanel();
@@ -104,16 +113,24 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         spoj.add(myIP);
         spoj.add(spojeni);
         spoj.add(kontakty);
-        JPanel panel = new JPanel();
+        final JPanel panel = new JPanel();
         this.setContentPane(panel);
         panel.setLayout(new GridBagLayout());
 
 
+        GridBagConstraints z = new GridBagConstraints();
+        z.fill = GridBagConstraints.HORIZONTAL;
+        z.weightx = 100;
+        z.gridx = 0;
+        z.gridy = 0;
+        z.gridwidth = 4;
+        panel.add(Pport, z);
+        
         GridBagConstraints a = new GridBagConstraints();
         a.fill = GridBagConstraints.HORIZONTAL;
         a.weightx = 100;
         a.gridx = 0;
-        a.gridy = 0;
+        a.gridy = 1;
         a.gridwidth = 4;
         panel.add(spoj, a);
 
@@ -125,8 +142,8 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         b.gridheight = 1;
         b.weightx = 30000;
         b.weighty = 5000;
-        panel.add(slist,b);
-        
+        panel.add(slist, b);
+
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.VERTICAL;
         c.weightx = 100;
@@ -136,9 +153,9 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         c.gridheight = 1;
         c.weightx = 30000;
         c.weighty = 3000;
-        panel.add(sseznam,c);
-                
-                GridBagConstraints d = new GridBagConstraints();
+        panel.add(sseznam, c);
+
+        GridBagConstraints d = new GridBagConstraints();
         d.fill = GridBagConstraints.BOTH;
         d.weightx = 100;
         d.gridx = 0;
@@ -147,8 +164,8 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         d.gridheight = 1;
         d.weightx = 3;
         d.weighty = 3;
-        panel.add(szadavadlo,d);
-        
+        panel.add(szadavadlo, d);
+
         GridBagConstraints e = new GridBagConstraints();
         e.fill = GridBagConstraints.VERTICAL;
         e.weightx = 100;
@@ -158,16 +175,10 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         e.gridheight = 1;
         e.weightx = 3;
         e.weighty = 3;
-        panel.add(Odesli,e);
+        panel.add(Odesli, e);
 
 
         this.setSize(new Dimension(430, 240));
-
-
-
-
-
-
 
 
         //obsluha kontaktů       
@@ -175,6 +186,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 seznam.setText(server.seznamSpojeni());
+                panel.updateUI();
                 Server.PredejSpojeni();
                 myIP.setText(Server.GetMyIP());
 
@@ -192,12 +204,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
                 }
             }
         });
-        //spuštění směrovacího serveru       
-        kontakty.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-            }
-        });
+       
 //obsluha odesílání
         Odesli.addActionListener(new ActionListener() {
             @Override
@@ -206,33 +213,31 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
                 zadavadlo.setText(null);
             }
         });
-    
- zadavadlo.addKeyListener(new KeyListener(){
-    @Override 
-    public void keyReleased(KeyEvent e) {
-        if(e.getKeyCode()==10){
-         if(e.getModifiers()==0){
-         String text=zadavadlo.getText();
-         if(text.length()>0){
-         text=text.substring(0,text.length()-1);
-         }
-         server.Odesli(text);
-                zadavadlo.setText(null); 
-         }else{
-         zadavadlo.append("\n");
-         }
-        }
-    }
+
+        zadavadlo.addKeyListener(new KeyListener() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == 10) {
+                    if (e.getModifiers() == 0) {
+                        String text = zadavadlo.getText();
+                        if (text.length() > 0) {
+                            text = text.substring(0, text.length() - 1);
+                        }
+                        server.Odesli(text);
+                        zadavadlo.setText(null);
+                    } else {
+                        zadavadlo.append("\n");
+                    }
+                }
+            }
 
             @Override
             public void keyTyped(KeyEvent e) {
-                
             }
 
             @Override
             public void keyPressed(KeyEvent e) {
-               
             }
-    });
-}
+        });
+    }
 }
