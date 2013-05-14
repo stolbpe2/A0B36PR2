@@ -13,9 +13,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -28,10 +25,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-/**
- *
- * @author Punk
- */
+//hlavní třída programu
 public class Stolbpe2_semestralkaPR2 extends JFrame {
 
     private static boolean spustenserver = false;
@@ -40,19 +34,19 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         list.append(m.odesilatel + ":  " + m.obsah + "\n");
         JScrollBar vertical = slist.getVerticalScrollBar();
         vertical.setValue(vertical.getMaximum());
+        history.add(m);
     }
 
     static void Seznam() {
         seznam.setText(server.seznamSpojeni());
     }
-    static final JTextArea list = new JTextArea();
-    static History History = new History();
-    static JTextArea seznam = new JTextArea();
-    static JScrollPane slist = new JScrollPane(list);
-    static Server server = null;
-
+    static private final JTextArea list = new JTextArea();
+    static private History History = new History();
+    static private JTextArea seznam = new JTextArea();
+    static private JScrollPane slist = new JScrollPane(list);
+    static private Main server = null;
+    static private History history=new History();  
     public static void main(String[] args) {
-
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException unused) {
@@ -62,14 +56,13 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setVisible(true);
         window.setSize(100, 100);
-        //server.execute();
     }
 
     static void pridejClienta(InetAddress IP, int intsocket) {
         server.Pridej(IP, intsocket);
     }
 
-    //samotný program
+    //Grafická část programu, využívá GridBagLayout
     public Stolbpe2_semestralkaPR2() {
 
 
@@ -99,7 +92,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         JButton spojeni = new JButton("Connect");
         JButton kontakty = new JButton("Obnov");
         JLabel majIP = new JLabel("moje IP:");
-        myIP.setText(Server.GetMyIP());
+        myIP.setText(Main.GetMyIP());
         list.setEditable(false);
         this.pack();
         this.setTitle("Messenger stolbpe2");
@@ -170,47 +163,32 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         e.weightx = 3;
         e.weighty = 3;
         panel.add(Odesli, e);
+this.update(null);
 
-
-
-
-
-
-
-
-
-        //obsluha kontaktů       
-        kontakty.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                seznam.setText(server.seznamSpojeni());
-                panel.updateUI();
-                Server.PredejSpojeni();
-                myIP.setText(Server.GetMyIP());
-
-            }
-        });
-        //obsluha spojení        
+        //actionlistener pro zahajování spojení        
         spojeni.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String t = IP.getText();
                 try {
                     if (spustenserver) {
-                        if(Server.getSocket()==Integer.parseInt(spojport.getText())){
-                        Server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
+                        if(server.getSocket()==Integer.parseInt(spojport.getText())){
+                        server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
                         }else{
-                        server=new Server(Integer.parseInt(spojport.getText()));
+                        server.changePort(Integer.parseInt(spojport.getText()));
+                        server.execute();
+//                    
+                        server = new Main(Integer.parseInt(spojport.getText()));
                         server.execute();
                         Stolbpe2_semestralkaPR2.Zobraz(new Message("spouštím server na portu: " + spojport.getText()));
-                        Server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
+                        //server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
                         }
                     } else {
                         Stolbpe2_semestralkaPR2.Zobraz(new Message("spouštím server na portu: " + spojport.getText()));
-                        server = new Server(Integer.parseInt(spojport.getText()));
+                        server = new Main(Integer.parseInt(spojport.getText()));
                         server.execute();
                         spustenserver = true;
-                        Server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
+                        //server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
                     }
                 
                 } catch (IOException ex) {
@@ -219,7 +197,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
             }
         });
 
-//obsluha odesílání
+//actionlistener pro odesílání
         Odesli.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -228,6 +206,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
             }
         });
 
+        //key listenery pro potvrzování pomocí enteru
         zadavadlo.addKeyListener(new KeyListener() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -241,6 +220,86 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
                         zadavadlo.setText(null);
                     } else {
                         zadavadlo.append("\n");
+                    }
+                }
+            }
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+            }
+        });
+        
+        IP.addKeyListener(new KeyListener() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == 10) {
+                   String t = IP.getText();
+                try {
+                    if (spustenserver) {
+                        if(server.getSocket()==Integer.parseInt(spojport.getText())){
+                        server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
+                        }else{
+                        server=new Main(Integer.parseInt(spojport.getText()));
+                        server.execute();
+                        Stolbpe2_semestralkaPR2.Zobraz(new Message("spouštím server na portu: " + spojport.getText()));
+                        //server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
+                        }
+                    } else {
+                        Stolbpe2_semestralkaPR2.Zobraz(new Message("spouštím server na portu: " + spojport.getText()));
+                        server = new Main(Integer.parseInt(spojport.getText()));
+                        server.execute();
+                        spustenserver = true;
+                        //server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
+                    }
+                
+                } catch (IOException ex) {
+                    Stolbpe2_semestralkaPR2.Zobraz(new Message("nepovedlo se připojit k IP " + t, " možná špatný socket?"));
+                
+            
+                    }
+                }
+            }
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+            }
+        });
+        
+        spojport.addKeyListener(new KeyListener() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == 10) {
+                   String t = IP.getText();
+                try {
+                    if (spustenserver) {
+                        if(server.getSocket()==Integer.parseInt(spojport.getText())){
+                        server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
+                        }else{
+                        server=new Main(Integer.parseInt(spojport.getText()));
+                        server.execute();
+                        Stolbpe2_semestralkaPR2.Zobraz(new Message("spouštím server na portu: " + spojport.getText()));
+                        //server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
+                        }
+                    } else {
+                        Stolbpe2_semestralkaPR2.Zobraz(new Message("spouštím server na portu: " + spojport.getText()));
+                        server = new Main(Integer.parseInt(spojport.getText()));
+                        server.execute();
+                        spustenserver = true;
+                        //server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
+                    }
+                
+                } catch (IOException ex) {
+                    Stolbpe2_semestralkaPR2.Zobraz(new Message("nepovedlo se připojit k IP " + t, " možná špatný socket?"));
+                
+            
                     }
                 }
             }

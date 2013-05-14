@@ -6,20 +6,18 @@ package stolbpe2_semestralkapr2;
 
 import java.util.ArrayList;
 
-/**
- *
- * @author Punk
- */
+// třída uchovávající historii.
 public  class History {
     ArrayList<Message> seznam = new  ArrayList<>();
     public History(){
         
     }
-    
+//pridání zprávy do arraylistu    
     public void add(Message x){
     seznam.add(x);    
     }
-    
+ 
+//rychlé vypsání historie    
 @Override
 public String toString(){
     String text="";

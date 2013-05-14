@@ -10,14 +10,10 @@ import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author Punk
- */
+//serverové vlákno
 class ThreadServer extends Thread {
 
     private Socket socket;
@@ -28,22 +24,20 @@ class ThreadServer extends Thread {
     private InetAddress adresa;
     Message prectena = new Message("Chyba");
 
+    
+    //konstruktor vlákna
     public ThreadServer(Socket s) {
         System.err.println("jsem nove serverove vlakno");
+        this.socket=s;
         try {
-            is = s.getInputStream();
-            os = s.getOutputStream();
-            ois = new ObjectInputStream(is);
-            adresa = s.getInetAddress();
+            this.is = this.socket.getInputStream();
+            this.os = this.socket.getOutputStream();
+            this.ois = new ObjectInputStream(is);
+            this.adresa = s.getInetAddress();
             System.err.println("threadserver: povedlo se otevřít komunikaci");
         } catch (IOException ex) {
             System.err.println("nepovedlo se otevřít komunikaci");
         }
-    }
-
-    public boolean IsActive() {
-        return (socket.isConnected());
-
     }
 
     @Override
@@ -64,7 +58,7 @@ class ThreadServer extends Thread {
             try {
                 if (!prectena.obsah.equals("//QUIT")) {
                     if (prectena.odesilatel.equals("intIP")) {
-                        Stolbpe2_semestralkaPR2.pridejClienta(prectena.IP);
+                        Stolbpe2_semestralkaPR2.pridejClienta(prectena.IP,prectena.socket);
                     } else {
                         Stolbpe2_semestralkaPR2.Zobraz(new Message(prectena.obsah, adresa.toString()));
                     }
@@ -74,13 +68,14 @@ class ThreadServer extends Thread {
                 }
             } catch (NullPointerException e) {
                 System.err.println("spojeni uzavreno");
+                Stolbpe2_semestralkaPR2.Seznam();
                 Ukonci();
             }
 
         }
 
     }
-
+//ukončení vlákna
     public void Ukonci() {
         try {
             socket.close();
@@ -88,20 +83,21 @@ class ThreadServer extends Thread {
             Logger.getLogger(ThreadServer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
+//ošetření neodesílání
     public void Odesli(String s) {
         throw new UnsupportedOperationException("Jsem Server");
     }
 
+
+    public void Odesli(InetAddress a) {
+        throw new UnsupportedOperationException("Jsem Server");
+    }
+  //gettery
     public final InetAddress Adresa() {
         return adresa;
     }
 
-    public boolean Stav() {
-        return socket.isConnected();
-    }
-
-    public void Odesli(InetAddress a) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    int getSocket() {
+       return socket.getPort();
     }
 }

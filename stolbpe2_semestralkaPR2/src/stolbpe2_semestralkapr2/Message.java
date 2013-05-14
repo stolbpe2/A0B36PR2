@@ -7,32 +7,30 @@ package stolbpe2_semestralkapr2;
 import java.io.Serializable;
 import java.net.InetAddress;
 
-/**
- *
- * @author Punk
- */
+//třída zprávy, pro standardizovanou práci s veškerými zprávami
 public class Message implements Serializable {
-public enum Typ {Error, Message, Info};
-Typ druh;
 String obsah;
 String odesilatel;
 InetAddress IP=null;
+int socket;
 
+//vytváření jednoduché zprávy se speciálním kódem odesílatele
 public Message(String m,String o){
 this.obsah=m;
 this.odesilatel=o;
-//druh=Typ.values()[2];
-}
 
+}
+//odesílání programové zprávy
 public Message(String m){
 this.obsah=m;
 this.odesilatel="program";
 //druh=Typ.values()[2];
 }
-
-public Message(InetAddress a){
+//zpráva pro předávání reference spojení
+public Message(InetAddress a,int ConSocket){
 this.obsah=a.getHostAddress();
 this.odesilatel="intIP";
 IP=a;
+socket = ConSocket;
 }
 }
