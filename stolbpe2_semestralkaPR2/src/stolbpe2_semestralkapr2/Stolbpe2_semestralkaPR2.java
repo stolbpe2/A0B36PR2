@@ -175,11 +175,7 @@ this.update(null);
                         if(server.getSocket()==Integer.parseInt(spojport.getText())){
                         server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
                         }else{
-                        server.changePort(Integer.parseInt(spojport.getText()));
-                        server.execute();
-//                    
-                        server = new Main(Integer.parseInt(spojport.getText()));
-                        server.execute();
+                        server.changePort(Integer.parseInt(spojport.getText()));                       
                         Stolbpe2_semestralkaPR2.Zobraz(new Message("spouštím server na portu: " + spojport.getText()));
                         //server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
                         }
