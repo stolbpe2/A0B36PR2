@@ -13,6 +13,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -59,6 +62,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
     }
 
     static void pridejClienta(InetAddress IP, int intsocket) {
+        //System.out.println("jdu pridat klienta:"+IP.getHostAddress()+" "+intsocket);
         server.Pridej(IP, intsocket);
     }
 
@@ -70,10 +74,16 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         zadavadlo.setEditable(true);
         JScrollPane szadavadlo = new JScrollPane(zadavadlo);
         szadavadlo.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        final JTextField IP = new JTextField("127.0.0.1");
+        String adresa=null;
+        try {
+            adresa=InetAddress.getLocalHost().getHostAddress();
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(Stolbpe2_semestralkaPR2.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        final JTextField IP = new JTextField(adresa);
         IP.setPreferredSize(new Dimension(95, 20));
         final JTextField spojport = new JTextField("5678");
-        spojport.setPreferredSize(new Dimension(40, 20));
+        spojport.setPreferredSize(new Dimension(35, 20));
         final JTextField myIP = new JTextField("");
         myIP.setPreferredSize(new Dimension(95, 20));
         list.setLineWrap(true);
@@ -89,7 +99,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
 
         final JButton Odesli = new JButton("    SEND!    ");
         Odesli.setSize(20, 90);
-        JButton spojeni = new JButton("Connect");
+        final JButton spojeni = new JButton("Spust server");
         JButton kontakty = new JButton("Obnov");
         JLabel majIP = new JLabel("moje IP:");
         myIP.setText(Main.GetMyIP());
@@ -171,19 +181,15 @@ this.update(null);
             public void actionPerformed(ActionEvent e) {
                 String t = IP.getText();
                 try {
-                    if (spustenserver) {
-                        if(server.getSocket()==Integer.parseInt(spojport.getText())){
+                    if (spustenserver){
                         server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
-                        }else{
-                        server.changePort(Integer.parseInt(spojport.getText()));                       
-                        Stolbpe2_semestralkaPR2.Zobraz(new Message("spouštím server na portu: " + spojport.getText()));
-                        //server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
-                        }
+                        
                     } else {
                         Stolbpe2_semestralkaPR2.Zobraz(new Message("spouštím server na portu: " + spojport.getText()));
                         server = new Main(Integer.parseInt(spojport.getText()));
                         server.execute();
                         spustenserver = true;
+                        spojeni.setText("Connect");
                         //server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
                     }
                 
@@ -235,20 +241,15 @@ this.update(null);
                 if (e.getKeyCode() == 10) {
                    String t = IP.getText();
                 try {
-                    if (spustenserver) {
-                        if(server.getSocket()==Integer.parseInt(spojport.getText())){
+                    if (spustenserver){
                         server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
-                        }else{
-                        server=new Main(Integer.parseInt(spojport.getText()));
-                        server.execute();
-                        Stolbpe2_semestralkaPR2.Zobraz(new Message("spouštím server na portu: " + spojport.getText()));
-                        //server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
-                        }
+                        
                     } else {
                         Stolbpe2_semestralkaPR2.Zobraz(new Message("spouštím server na portu: " + spojport.getText()));
                         server = new Main(Integer.parseInt(spojport.getText()));
                         server.execute();
                         spustenserver = true;
+                        spojeni.setText("Connect");
                         //server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
                     }
                 
@@ -275,28 +276,21 @@ this.update(null);
                 if (e.getKeyCode() == 10) {
                    String t = IP.getText();
                 try {
-                    if (spustenserver) {
-                        if(server.getSocket()==Integer.parseInt(spojport.getText())){
+                    if (spustenserver){
                         server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
-                        }else{
-                        server=new Main(Integer.parseInt(spojport.getText()));
-                        server.execute();
-                        Stolbpe2_semestralkaPR2.Zobraz(new Message("spouštím server na portu: " + spojport.getText()));
-                        //server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
-                        }
+                        
                     } else {
                         Stolbpe2_semestralkaPR2.Zobraz(new Message("spouštím server na portu: " + spojport.getText()));
                         server = new Main(Integer.parseInt(spojport.getText()));
                         server.execute();
                         spustenserver = true;
+                        spojeni.setText("Connect");
                         //server.Pridej(InetAddress.getByName(t), Integer.parseInt(spojport.getText()));
                     }
                 
                 } catch (IOException ex) {
                     Stolbpe2_semestralkaPR2.Zobraz(new Message("nepovedlo se připojit k IP " + t, " možná špatný socket?"));
-                
-            
-                    }
+                }
                 }
             }
 

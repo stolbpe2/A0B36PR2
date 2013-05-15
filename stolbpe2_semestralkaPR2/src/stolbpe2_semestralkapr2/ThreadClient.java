@@ -29,11 +29,12 @@ public class ThreadClient extends Thread {
         this.intSocket=intSocket;
         try {
             s = new Socket(IP, intSocket);
-        } catch (IOException ex) {
+        } catch (IOException | NullPointerException ex) {
             Stolbpe2_semestralkaPR2.Zobraz(new Message("chyba, na socketu:"+intSocket+" již jedna instance programu na tomoto počítači  běží"));
         }
+    this.start();
     }
-
+    
     @Override
     public final void start() {
         try {
@@ -43,7 +44,7 @@ public class ThreadClient extends Thread {
                     System.err.println("jsem nový klient, s IP: "+IP+" a na socketu: "+s.getPort());
             funguje=true;
            System.err.println("pripojuji se k "+IP.getHostAddress()+" a povedlo se mi to");
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
          System.err.println("pripojuji se k"+IP.getHostAddress()+"a nepovedlo se mi to");
         funguje=false;
         }
@@ -52,7 +53,7 @@ public class ThreadClient extends Thread {
 //ukončení vlákna
     public void Ukonci() {
         try {
-            oos.writeObject(new Message("//QUIT"));
+            oos.writeObject((Object)new Message("//QUIT"));
             oos.close();
             os.close();
             s.close();
@@ -63,17 +64,19 @@ public class ThreadClient extends Thread {
     }
 
 //odesílání zpráv
-    public synchronized void Odesli(String s) {
+    public void Odesli(String s) {
         try {
+            System.err.println("odesílám "+s);
             oos.writeObject((Object) new Message(s));
+            oos.flush();
         } catch (IOException | NullPointerException e) {
             Stolbpe2_semestralkaPR2.Zobraz(new Message("nepodarilo se mi odeslat"+ s+" na "+ IP.getHostAddress(),"PROGRAM"));
             funguje=false;
-        }
+    }
     }
  
-    public synchronized void Odesli(InetAddress a,int conSocket) {
-        Stolbpe2_semestralkaPR2.Zobraz(new Message(a.getHostAddress(), "Odesílám adresu s portem"+conSocket));
+    public void Odesli(InetAddress a,int conSocket) {
+        System.err.println("Odesílám adresu:"+a.getHostAddress()+"  "+conSocket);
         try {
             oos.writeObject((Object) new Message(a,conSocket));
         } catch (IOException | NullPointerException e) {
@@ -90,5 +93,9 @@ public class ThreadClient extends Thread {
     public boolean Stav() {
             return funguje;
         
+    }
+
+    int getSocket() {
+        return intSocket;
     }
 }

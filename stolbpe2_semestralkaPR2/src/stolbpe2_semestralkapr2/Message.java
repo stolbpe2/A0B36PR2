@@ -29,7 +29,7 @@ this.odesilatel="program";
 //zpráva pro předávání reference spojení
 public Message(InetAddress a,int ConSocket){
 this.obsah=a.getHostAddress();
-this.odesilatel="intIP";
+this.odesilatel="IP";
 IP=a;
 socket = ConSocket;
 }

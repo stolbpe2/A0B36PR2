@@ -21,25 +21,40 @@ import javax.swing.SwingWorker;
 //4)předávání vlastních referencí dále do sítě
 public final class Main extends SwingWorker {
 
-    static List<TwoDSpojeni> polespojeni = Collections.synchronizedList(new ArrayList());
+    static List<ThreadClient> poleclient =new ArrayList();
+    static List<ThreadServer> poleserver = new ArrayList();
     static List<InetAddress> zakadresy = Collections.synchronizedList(new ArrayList());
     static InetAddress local = null;
-    ServerSocket s;
-    DistributeMyConnections distribute = new DistributeMyConnections();
+    static ServerSocket s;
+    DistributeMyConnections distribute;
 
     //vrací socket na kterém naní naslouchám
-    public int getSocket() {
-    return s.getLocalPort();
+    static public int getSocket() {
+        return s.getLocalPort();
     }
-   
+
 //externí volání přidání nového klienta 
-    public void Pridej(InetAddress inet,int intsocket) {
-        Pridej temp = new Pridej(inet,intsocket);
+    public void Pridej(InetAddress adresa, int intsocket) {
+        boolean obsahuje=false;
+        //if(!(intsocket==getSocket())){
+        for (int i = 0; i < (poleclient.size()); i++) {
+                        //System.err.println("!Pridej: porovnavam:" + poleclient.get(i).Adresa().getHostAddress()  +poleclient.get(i).getSocket() + " a " + adresa.getHostAddress() + intsocket);
+                        if ((poleclient.get(i).Adresa().equals(adresa)) & (poleclient.get(i).getSocket() == intsocket)) {
+                            obsahuje=true;
+                        }
+                    }
+                    if (!obsahuje) {
+                        poleclient.add(new ThreadClient(adresa, intsocket));
+                        //Stolbpe2_semestralkaPR2.Zobraz(new Message("!Pridej: pridavam spojeni" + adresa + "  " + intsocket));
+                        Main.PredejSpojeni();
+                        Stolbpe2_semestralkaPR2.Seznam();
+                    //}        
+        }
     }
 
 //vytvoření nové instance, na začátku se vytvoří seznam zakázaných adres
     public Main(int sock) throws IllegalArgumentException, IOException {
-        
+
         try {
             local = InetAddress.getByName("127.0.0.1");
 
@@ -51,29 +66,28 @@ public final class Main extends SwingWorker {
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-            s = new ServerSocket(sock);
-            
-        
+        s = new ServerSocket(sock);
+
+
     }
 
-    
     //spuštění main, pro spouštění pomocí GUI (a práci na pozadí) je vytvořen jako vlákno ve SwingWorkeru
     @Override
     protected Object doInBackground() {
+        
         Socket socket = null;
-        ThreadServer docasnespojeni = null;
         while (true) {
             try {
-                
+
                 System.err.println("akceptuji nové spojení");
-                Socket sock = s.accept();
-                ThreadServer docasny = new ThreadServer(sock);
-                docasny.start();
-                System.err.println("mám dočasné spojení ");
-                Pridej klienta = new Pridej(docasny.Adresa(),this.getSocket());
-                Pridej prirad = new Pridej(docasny);
+                    distribute = new DistributeMyConnections();
+                ThreadServer docasny = new ThreadServer(s.accept());
+                
+                if(!poleserver.contains(docasny)){
+                    poleserver.add(docasny);
+                }
             } catch (IOException ex) {
-            System.out.println("spadl server!");
+                System.out.println("spadl server!");
             }
         }
     }
@@ -81,47 +95,46 @@ public final class Main extends SwingWorker {
     //funkce předávající  současná spojení ostatním klientům v síti, pro aktualitu celé sítě
     public static void PredejSpojeni() {
         Main.UdrzSpojeni();
-        List<TwoDSpojeni> bezi;
+        int size=poleclient.size();
+        for (int i = 0; i < size ; i++) {
+            for (int j = 0; i < size ; i++) {
+                    poleclient.get(i).Odesli(poleclient.get(j).Adresa(), poleclient.get(j).getSocket());
 
-        for (int i = 0; i < polespojeni.size()-1; i++) {
-            bezi = polespojeni.subList(0, i);
-            bezi.addAll(polespojeni.subList(i + 1, polespojeni.size()));
-            for (int j = 0; i < bezi.size()-1; i++) {
-                if (!zakadresy.contains(polespojeni.get(i).Adresa())) {
-                    polespojeni.get(i).Odesli(bezi.get(j).Adresa(),bezi.get(j).getSocket());
-
-                    System.err.println("predavam" + bezi.get(j).Adresa().toString());
-                }
-
-            }
+                    //System.err.println("predavam" + poleclient.get(j).Adresa().toString()+" "+getSocket());
+                
+         poleclient.get(i).Odesli(GetMyIP(true), getSocket());       
         }
+            
+            }
 
     }
 //funkce vracející seznam všech spojení, používaná pro výpis do GUI
+
     public String seznamSpojeni() {
         Main.UdrzSpojeni();
-        Collections.sort(polespojeni);
+        //Collections.sort(polespojeni);
         String temp, a = "";
-        System.err.println("SeznamSpojeni vypisuji seznamspojeni");
-        for (int i = 0; i < (polespojeni.size()); i++) {
-            temp = polespojeni.get(i).Adresa().getHostAddress();
+        //System.err.println("SeznamSpojeni vypisuji seznamspojeni o velikosti: "+poleclient.size());
+        for (int i = 0; i < (poleclient.size()); i++) {
+            temp = poleclient.get(i).Adresa().getHostAddress() + " " + poleclient.get(i).getSocket();
             a = a + "\n" + temp;
         }
         return a;
     }
 //funkce procházející celý seznam a ověřuje zda jsou spojení aktivní, případně je vymaže
+
     public static void UdrzSpojeni() {
 
-        for (int i = 0; i < polespojeni.size(); i++) {
+        for (int i = 0; i < poleclient.size(); i++) {
 
-            if (!polespojeni.get(i).Stav()) {
-                System.err.println("mazu spojeni-stav" + polespojeni.get(i).adresa.getHostAddress());
-                polespojeni.remove(i);
+            if (!poleclient.get(i).Stav()) {
+                System.err.println("mazu spojeni-stav" + poleclient.get(i).Adresa().getHostAddress());
+                poleclient.remove(i);
                 i--;
 
             }
         }
-        
+
 //zde je zakomentováno mazání localhost adresy, aby bylo možno program testovat na jednom počítači        
 //        boolean smazano=false;
 //        for (int i = 0; i < polespojeni.size(); i++) {
@@ -135,20 +148,19 @@ public final class Main extends SwingWorker {
 
     }
 
-    
 //funkce pro odesílání zpráv
     public void Odesli(String zprava) {
         Stolbpe2_semestralkaPR2.Zobraz(new Message(zprava, "Já:  "));
-        for (int i = 0; i < polespojeni.size(); i++) {
+        for (int i = 0; i < poleclient.size(); i++) {
             try {
-                polespojeni.get(i).Odesli(zprava);
+                System.err.println("odesílám klientovi");
+                poleclient.get(i).Odesli(zprava);
             } catch (Error e) {
             }
         }
     }
 
-    
-   //získání vlastní IP Adresy
+    //získání vlastní IP Adresy
     public static String GetMyIP() {
         try {
             return InetAddress.getLocalHost().getHostAddress().toString();
@@ -157,73 +169,18 @@ public final class Main extends SwingWorker {
         }
     }
 
+    //získání vlastní IP Adresy
+    public static InetAddress GetMyIP(boolean a) {
+        try {
+            return InetAddress.getLocalHost();
+        } catch (UnknownHostException ex) {
+            return null;
+        }
+    }
+
     void changePort(int port) throws IOException {
-     s = new ServerSocket(port);   
+        s = new ServerSocket(port);
     }
 
-   //vnitřní třída Serveru, realizující přidávání do arraylistu spojení
-    public class Pridej extends Thread{
-
-        InetAddress adresa = null;
-        int intsocket=5678;
-        boolean obsahuje;
-        boolean jenserver;
-        ThreadServer server;
-
-        public Pridej(InetAddress IP,int intSocket) {
-            adresa = IP;
-            this.intsocket=intSocket;
-            obsahuje = false;
-            jenserver = false;
-            this.start();
-        }
-
-        public Pridej() {
-            obsahuje = true;
-            jenserver = false;
-            this.start();
-
-        }
-
-        public Pridej(ThreadServer server) {
-            this.obsahuje = false;
-            this.jenserver = true;
-            this.server = server;
-            this.start();
-        }
-
-        @Override
-        public final void run() {
-            if (!jenserver) {
-                if ((!zakadresy.contains(adresa)) & (!obsahuje)) {
-
-                    for (int i = 0; i < (polespojeni.size()); i++) {
-                        System.err.println("Pridej: porovnavam:" + polespojeni.get(i).Adresa().getHostAddress() + " a " + adresa.getHostAddress());
-                        if (polespojeni.get(i).Adresa().getHostAddress().equals(adresa.getHostAddress())) {
-                            obsahuje = true;
-                        }
-                    }
-                    if (!obsahuje) {
-                        polespojeni.add(new TwoDSpojeni(adresa,intsocket));
-                        
-                        System.err.println("Pridej: pridavam spojeni"+adresa+"  "+intsocket);
-                        Main.PredejSpojeni();
-                    }
-                }
-            } else {
-                for (int i = 0; i < (polespojeni.size()); i++) {
-                    System.err.println("Pridej-jenserver: porovnavam:" + polespojeni.get(i).Adresa().getHostAddress() + " a " + server.Adresa().getHostAddress());
-                    if (polespojeni.get(i).Adresa().equals(server.Adresa())) {
-                        polespojeni.get(i).priradServer(server);
-                    }
-                }
-                if (obsahuje) {
-                    polespojeni.add(new TwoDSpojeni(server));
-                    System.err.println("Pridej: pridavam spojeni-server uz mam"+server.Adresa());
-                    Main.PredejSpojeni();
-                }
-            }
-            Stolbpe2_semestralkaPR2.Seznam();
-        }
+   
     }
-}

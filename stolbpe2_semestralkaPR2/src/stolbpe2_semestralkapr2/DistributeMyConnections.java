@@ -26,9 +26,11 @@ this.start();
     public void run() {
         while (true) {
            Main.PredejSpojeni();
+           Stolbpe2_semestralkaPR2.Seznam();
            //System.err.println("Distribute: predavam spojeni");
             try {
                 Thread.sleep(10000);
+                
             } catch (InterruptedException ex) {
                System.err.println("Distribute: automaticky predavam driv");
             }

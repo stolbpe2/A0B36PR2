@@ -7,7 +7,7 @@ package stolbpe2_semestralkapr2;
 import java.net.InetAddress;
 
 //třída spojující serverovou a klientskou část každého proudu spojení
-public class TwoDSpojeni extends Thread implements Comparable {
+public class TwoDSpojeni implements Comparable {
 
     ThreadServer sthread = null;
     ThreadClient cthread;
@@ -16,10 +16,9 @@ public class TwoDSpojeni extends Thread implements Comparable {
     //několik konstruktorů spojení pro různé typy vzniku spojení
     public TwoDSpojeni(ThreadServer s) {
         this.sthread = s;
-        System.err.println("TwoDSpojeni: mám server thread, jdu spustit klienta");
+        System.err.println("TwoDSpojeni: mám server thread");
         adresa = this.sthread.Adresa();
-        this.cthread = new ThreadClient(adresa, sthread.getSocket());
-        this.start();
+        this.cthread = null;
 
 
     }
@@ -28,19 +27,25 @@ public class TwoDSpojeni extends Thread implements Comparable {
         adresa = IP;
         System.err.println("jdu ziskat založit klienta s portem"+conSocket);
         this.cthread = new ThreadClient(IP, conSocket);
-        this.start();
+
     }
 
     public TwoDSpojeni(ThreadClient s) {
         this.cthread = s;
+        this.cthread.start();
         adresa = cthread.Adresa();
         s.Odesli("chci se pripojit");
-        this.start();
 
     }
 //přiřazení serverové části k již existující klientské části
     public void priradServer(ThreadServer s) {
         this.sthread = s;
+        System.err.println("TwoDS:prirazuji server");
+    }
+    
+  public void priradKlienta(ThreadClient s) {
+        this.cthread = s;
+        System.err.println("TwoDS:prirazuji klienta");
     }
 //několik typů odesílání, standardní zpráva a zpráva pro přenos IP adresy
     public void Odesli(String s) {
@@ -67,23 +72,28 @@ public class TwoDSpojeni extends Thread implements Comparable {
     }
 
     public int getSocket() {
+        try{
         return sthread.getSocket();
+        }catch(NullPointerException e){
+            return cthread.getSocket();
+    }
     }
 
     public boolean Stav() {
-        return cthread.Stav();
+//        if (sthread.Stav()){
+//        return sthread.Stav();}else{
+//            return cthread.Stav();
+//        }
+        return true;
     }
 
 
-    @Override
-    public void run() {
-        this.cthread.start();
-        System.err.println("spusteny klientska i serverova vlakna");
-    }
 //komparátor pro seřazení kontaktů před zobrazením.
     @Override
     public int compareTo(Object o) {
         TwoDSpojeni druhe = (TwoDSpojeni) o;
         return druhe.Adresa().getAddress().toString().compareTo(this.Adresa().getAddress().toString());
     }
+
+  
 }
