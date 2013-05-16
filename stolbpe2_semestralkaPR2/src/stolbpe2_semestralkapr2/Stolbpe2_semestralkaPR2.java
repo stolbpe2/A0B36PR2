@@ -91,7 +91,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         seznam.setEditable(false);
         JScrollPane sseznam = new JScrollPane(seznam);
         sseznam.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        sseznam.setPreferredSize(new Dimension(110, 90));
+        sseznam.setPreferredSize(new Dimension(110, 100));
         boolean spustenserever = false;
 
         myIP.setEditable(false);
@@ -106,7 +106,7 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         list.setEditable(false);
         this.pack();
         this.setTitle("Messenger stolbpe2");
-        this.setMinimumSize(new Dimension(400, 230));
+        //this.setMinimumSize(new Dimension(400, 250));
         this.setLocationRelativeTo(null);
 
 
@@ -173,7 +173,9 @@ public class Stolbpe2_semestralkaPR2 extends JFrame {
         e.weightx = 3;
         e.weighty = 3;
         panel.add(Odesli, e);
-this.update(null);
+        
+        this.setMinimumSize(new Dimension(400, 280));
+this.update(getGraphics());
 
         //actionlistener pro zahajování spojení        
         spojeni.addActionListener(new ActionListener() {

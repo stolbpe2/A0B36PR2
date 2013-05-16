@@ -66,7 +66,7 @@ public class ThreadClient extends Thread {
 //odesílání zpráv
     public void Odesli(String s) {
         try {
-            System.err.println("odesílám "+s);
+            //System.err.println("odesílám "+s);
             oos.writeObject((Object) new Message(s));
             oos.flush();
         } catch (IOException | NullPointerException e) {

@@ -21,9 +21,9 @@ import javax.swing.SwingWorker;
 //4)předávání vlastních referencí dále do sítě
 public final class Main extends SwingWorker {
 
-    static List<ThreadClient> poleclient =new ArrayList();
-    static List<ThreadServer> poleserver = new ArrayList();
-    static List<InetAddress> zakadresy = Collections.synchronizedList(new ArrayList());
+    static ArrayList<ThreadClient> poleclient =new ArrayList();
+    static ArrayList<ThreadServer> poleserver = new ArrayList();
+    static ArrayList<InetAddress> zakadresy = new ArrayList();
     static InetAddress local = null;
     static ServerSocket s;
     DistributeMyConnections distribute;
@@ -36,6 +36,7 @@ public final class Main extends SwingWorker {
 //externí volání přidání nového klienta 
     public void Pridej(InetAddress adresa, int intsocket) {
         boolean obsahuje=false;
+        if(!((adresa.equals(GetMyIP(true)))&(intsocket==(getSocket())))){
         for (int i = 0; i < (poleclient.size()); i++) {
                         //System.err.println("!Pridej: porovnavam:" + poleclient.get(i).Adresa().getHostAddress()  +poleclient.get(i).getSocket() + " a " + adresa.getHostAddress() + intsocket);
                         if ((poleclient.get(i).Adresa().equals(adresa)) & (poleclient.get(i).getsocket() == intsocket)) {
@@ -47,7 +48,8 @@ public final class Main extends SwingWorker {
                         //Stolbpe2_semestralkaPR2.Zobraz(new Message("!Pridej: pridavam spojeni" + adresa + "  " + intsocket));
                         Main.PredejSpojeni();
                         Stolbpe2_semestralkaPR2.Seznam();
-                    //}        
+                         
+       }
         }
     }
 
@@ -96,15 +98,17 @@ public final class Main extends SwingWorker {
         Main.UdrzSpojeni();
         int size=poleclient.size();
         System.out.println(size);
+        ArrayList<ThreadClient> policko=poleclient;
         if(size>0){
         for (int i = 0; i < size ; i++) {
             for (int j = 0; j < size ; j++) {
-                InetAddress adresa=poleclient.get(j).Adresa();
-                int socket=poleclient.get(j).getsocket();
-                    poleclient.get(i).Odesli(adresa,socket);
-                    System.err.println("predavam" +adresa+" "+socket);               
-         poleclient.get(i).Odesli(GetMyIP(true), getSocket());       
+                InetAddress adresa=policko.get(j).Adresa();
+                int socket=policko.get(j).getsocket();
+                    policko.get(i).Odesli(adresa,socket);
+                    System.err.println("predavam" +adresa+" "+socket);                          
         }
+            policko.get(i).Odesli(GetMyIP(true), getSocket()); 
+            System.err.println("predavam" +GetMyIP(true)+" "+getSocket());
             
             }
         }
@@ -152,7 +156,7 @@ public final class Main extends SwingWorker {
         Stolbpe2_semestralkaPR2.Zobraz(new Message(zprava, "Já:  "));
         for (int i = 0; i < poleclient.size(); i++) {
             try {
-                System.err.println("odesílám klientovi");
+                //System.err.println("odesílám klientovi");
                 poleclient.get(i).Odesli(zprava);
             } catch (Error e) {
             }
