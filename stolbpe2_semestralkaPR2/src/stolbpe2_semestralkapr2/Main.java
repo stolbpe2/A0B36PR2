@@ -36,10 +36,9 @@ public final class Main extends SwingWorker {
 //externí volání přidání nového klienta 
     public void Pridej(InetAddress adresa, int intsocket) {
         boolean obsahuje=false;
-        //if(!(intsocket==getSocket())){
         for (int i = 0; i < (poleclient.size()); i++) {
                         //System.err.println("!Pridej: porovnavam:" + poleclient.get(i).Adresa().getHostAddress()  +poleclient.get(i).getSocket() + " a " + adresa.getHostAddress() + intsocket);
-                        if ((poleclient.get(i).Adresa().equals(adresa)) & (poleclient.get(i).getSocket() == intsocket)) {
+                        if ((poleclient.get(i).Adresa().equals(adresa)) & (poleclient.get(i).getsocket() == intsocket)) {
                             obsahuje=true;
                         }
                     }
@@ -96,27 +95,29 @@ public final class Main extends SwingWorker {
     public static void PredejSpojeni() {
         Main.UdrzSpojeni();
         int size=poleclient.size();
+        System.out.println(size);
+        if(size>0){
         for (int i = 0; i < size ; i++) {
-            for (int j = 0; i < size ; i++) {
-                    poleclient.get(i).Odesli(poleclient.get(j).Adresa(), poleclient.get(j).getSocket());
-
-                    //System.err.println("predavam" + poleclient.get(j).Adresa().toString()+" "+getSocket());
-                
+            for (int j = 0; j < size ; j++) {
+                InetAddress adresa=poleclient.get(j).Adresa();
+                int socket=poleclient.get(j).getsocket();
+                    poleclient.get(i).Odesli(adresa,socket);
+                    System.err.println("predavam" +adresa+" "+socket);               
          poleclient.get(i).Odesli(GetMyIP(true), getSocket());       
         }
             
             }
+        }
 
     }
 //funkce vracející seznam všech spojení, používaná pro výpis do GUI
 
     public String seznamSpojeni() {
         Main.UdrzSpojeni();
-        //Collections.sort(polespojeni);
         String temp, a = "";
         //System.err.println("SeznamSpojeni vypisuji seznamspojeni o velikosti: "+poleclient.size());
         for (int i = 0; i < (poleclient.size()); i++) {
-            temp = poleclient.get(i).Adresa().getHostAddress() + " " + poleclient.get(i).getSocket();
+            temp = poleclient.get(i).Adresa().getHostAddress() + " " + poleclient.get(i).getsocket();
             a = a + "\n" + temp;
         }
         return a;
@@ -126,12 +127,10 @@ public final class Main extends SwingWorker {
     public static void UdrzSpojeni() {
 
         for (int i = 0; i < poleclient.size(); i++) {
-
             if (!poleclient.get(i).Stav()) {
                 System.err.println("mazu spojeni-stav" + poleclient.get(i).Adresa().getHostAddress());
                 poleclient.remove(i);
                 i--;
-
             }
         }
 

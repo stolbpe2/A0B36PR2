@@ -21,7 +21,7 @@ class ThreadServer extends Thread {
     private ObjectInputStream ois;
     private String chyba;
     private InetAddress adresa;
-    Message prectena = new Message("Chyba");
+    Message prectena = new Message("chyba","chyba");
     boolean funkcni = true;
 
     //konstruktor vlákna
@@ -42,7 +42,7 @@ class ThreadServer extends Thread {
     public void run() {
 
         while (true) {
-
+            prectena = new Message("chyba","chyba");
             Object precteny = null;
             try {            
                 precteny = ois.readObject();
@@ -50,10 +50,8 @@ class ThreadServer extends Thread {
             } catch (ClassCastException | IOException | ClassNotFoundException ex) {
                 
             }    
-
-
             try {
-
+if (!prectena.odesilatel.equals("chyba")) {
                 if (prectena.odesilatel.equals("IP")) {
              Stolbpe2_semestralkaPR2.pridejClienta(prectena.IP, prectena.socket);
                 //System.err.println("mam prichozi zpravu-IP"+prectena.IP.getHostAddress()+"  "+prectena.socket);
@@ -61,11 +59,13 @@ class ThreadServer extends Thread {
                 Stolbpe2_semestralkaPR2.Zobraz(new Message(prectena.obsah, socket.getInetAddress().getHostAddress() + " " + socket.getPort()));
                 //System.err.println("mam prichozi zpravu-text");
                 }
+}else{throw new NullPointerException();}
                 } catch (NullPointerException e) {
-                System.err.println("spojeni uzavreno");
+                //System.err.println("spojeni uzavreno");
                 Stolbpe2_semestralkaPR2.Seznam();
                 Ukonci();
             }
+        
         }
 
     }

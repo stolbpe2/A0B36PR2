@@ -76,7 +76,7 @@ public class ThreadClient extends Thread {
     }
  
     public void Odesli(InetAddress a,int conSocket) {
-        System.err.println("Odesílám adresu:"+a.getHostAddress()+"  "+conSocket);
+        //System.err.println("Odesílám adresu:"+a.getHostAddress()+"  "+conSocket);
         try {
             oos.writeObject((Object) new Message(a,conSocket));
         } catch (IOException | NullPointerException e) {
@@ -95,7 +95,7 @@ public class ThreadClient extends Thread {
         
     }
 
-    int getSocket() {
+    int getsocket() {
         return intSocket;
     }
 }
