@@ -49,7 +49,7 @@ public final class Main extends SwingWorker {
                         Main.PredejSpojeni();
                         Stolbpe2_semestralkaPR2.Seznam();
                          
-       }
+      }
         }
     }
 
@@ -98,17 +98,16 @@ public final class Main extends SwingWorker {
         Main.UdrzSpojeni();
         int size=poleclient.size();
         System.out.println(size);
-        ArrayList<ThreadClient> policko=poleclient;
         if(size>0){
         for (int i = 0; i < size ; i++) {
             for (int j = 0; j < size ; j++) {
-                InetAddress adresa=policko.get(j).Adresa();
-                int socket=policko.get(j).getsocket();
-                    policko.get(i).Odesli(adresa,socket);
+                InetAddress adresa=poleclient.get(j).Adresa();
+                int socket=poleclient.get(j).getsocket();
+                    poleclient.get(i).Odesli(adresa,socket);
                     System.err.println("predavam" +adresa+" "+socket);                          
         }
-            policko.get(i).Odesli(GetMyIP(true), getSocket()); 
-            System.err.println("predavam" +GetMyIP(true)+" "+getSocket());
+            poleclient.get(i).Odesli(GetMyIP(true), getSocket()); 
+            System.err.println("predavam "+getSocket());
             
             }
         }
@@ -134,6 +133,13 @@ public final class Main extends SwingWorker {
             if (!poleclient.get(i).Stav()) {
                 System.err.println("mazu spojeni-stav" + poleclient.get(i).Adresa().getHostAddress());
                 poleclient.remove(i);
+                i--;
+            }
+        }
+         for (int i = 0; i < poleserver.size(); i++) {
+            if (!poleserver.get(i).Stav()) {
+                System.err.println("mazu spojeni-stav" + poleserver.get(i).Adresa().getHostAddress());
+                poleserver.remove(i);
                 i--;
             }
         }

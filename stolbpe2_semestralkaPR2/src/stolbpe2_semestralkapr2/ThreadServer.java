@@ -61,7 +61,8 @@ if (!prectena.odesilatel.equals("chyba")) {
                 }
 }else{throw new NullPointerException();}
                 } catch (NullPointerException e) {
-                //System.err.println("spojeni uzavreno");
+                System.err.println("spojeni uzavreno");
+                funkcni=false;
                 Stolbpe2_semestralkaPR2.Seznam();
                 Ukonci();
             }
