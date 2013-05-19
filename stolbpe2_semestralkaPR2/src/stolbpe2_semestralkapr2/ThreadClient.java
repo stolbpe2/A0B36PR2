@@ -79,6 +79,7 @@ public class ThreadClient extends Thread {
         //System.err.println("Odesílám adresu:"+a.getHostAddress()+"  "+conSocket);
         try {
             oos.writeObject((Object) new Message(a,conSocket));
+            //System.err.println("odesílám adresu");
         } catch (IOException | NullPointerException e) {
             System.err.println("nepovedlo se odeslat");
             funguje=false;

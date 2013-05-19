@@ -73,7 +73,7 @@ public class TwoDSpojeni implements Comparable {
 
     public int getSocket() {
         try{
-        return sthread.getSocket();
+        return sthread.getsocket();
         }catch(NullPointerException e){
             return cthread.getsocket();
     }

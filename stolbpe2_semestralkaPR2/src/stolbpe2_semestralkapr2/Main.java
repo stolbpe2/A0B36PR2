@@ -10,8 +10,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingWorker;
@@ -68,6 +66,7 @@ public final class Main extends SwingWorker {
         }
 
         s = new ServerSocket(sock);
+        distribute = new DistributeMyConnections();
 
 
     }
@@ -79,9 +78,8 @@ public final class Main extends SwingWorker {
         Socket socket = null;
         while (true) {
             try {
-
                 System.err.println("akceptuji nové spojení");
-                    distribute = new DistributeMyConnections();
+                    
                 ThreadServer docasny = new ThreadServer(s.accept());
                 
                 if(!poleserver.contains(docasny)){
@@ -97,17 +95,16 @@ public final class Main extends SwingWorker {
     public static void PredejSpojeni() {
         Main.UdrzSpojeni();
         int size=poleclient.size();
-        System.out.println(size);
         if(size>0){
         for (int i = 0; i < size ; i++) {
             for (int j = 0; j < size ; j++) {
                 InetAddress adresa=poleclient.get(j).Adresa();
                 int socket=poleclient.get(j).getsocket();
                     poleclient.get(i).Odesli(adresa,socket);
-                    System.err.println("predavam" +adresa+" "+socket);                          
+                    System.out.println("predavam" +adresa+" "+socket);                          
         }
             poleclient.get(i).Odesli(GetMyIP(true), getSocket()); 
-            System.err.println("predavam "+getSocket());
+            System.out.println("predavam "+getSocket());
             
             }
         }
@@ -145,12 +142,10 @@ public final class Main extends SwingWorker {
         }
 
 //zde je zakomentováno mazání localhost adresy, aby bylo možno program testovat na jednom počítači        
-//        boolean smazano=false;
 //        for (int i = 0; i < polespojeni.size(); i++) {
 //                 if ((polespojeni.get(i).Adresa().equals(local))&!smazano) {
 //                 System.err.println("mazu spojeni-localhost" +polespojeni.get(i).adresa.getHostAddress());
 //                    polespojeni.remove(i);
-//                    smazano=true;
 //                    i--;
 //                 }
 //        }

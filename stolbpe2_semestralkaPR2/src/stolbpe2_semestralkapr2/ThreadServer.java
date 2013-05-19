@@ -7,11 +7,8 @@ package stolbpe2_semestralkapr2;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 //serverové vlákno
 class ThreadServer extends Thread {
@@ -23,6 +20,7 @@ class ThreadServer extends Thread {
     private InetAddress adresa;
     Message prectena = new Message("chyba","chyba");
     boolean funkcni = true;
+    int chyby=0;
 
     //konstruktor vlákna
     public ThreadServer(Socket s) {
@@ -41,9 +39,9 @@ class ThreadServer extends Thread {
     @Override
     public void run() {
 
-        while (true) {
+        do{
             prectena = new Message("chyba","chyba");
-            Object precteny = null;
+            Object precteny = (Message) prectena;
             try {            
                 precteny = ois.readObject();
                 prectena = (Message) precteny;
@@ -62,18 +60,19 @@ if (!prectena.odesilatel.equals("chyba")) {
 }else{throw new NullPointerException();}
                 } catch (NullPointerException e) {
                 System.err.println("spojeni uzavreno");
-                funkcni=false;
+                chyby++;
+                if(chyby>50){
                 Stolbpe2_semestralkaPR2.Seznam();
                 Ukonci();
+                }
             }
         
-        }
+        }while(funkcni);
 
     }
 //ukončení vlákna
 
     public void Ukonci() {
-
         funkcni = false;
 
     }
@@ -92,7 +91,7 @@ if (!prectena.odesilatel.equals("chyba")) {
         return socket.getInetAddress();
     }
 
-    int getSocket() {
+    int getsocket() {
         return socket.getPort();
     }
 

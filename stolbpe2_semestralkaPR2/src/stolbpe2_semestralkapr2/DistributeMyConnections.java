@@ -4,12 +4,6 @@
  */
 package stolbpe2_semestralkapr2;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  *
  * @author Punk
@@ -27,7 +21,6 @@ this.start();
         while (true) {
            Main.PredejSpojeni();
            Stolbpe2_semestralkaPR2.Seznam();
-           //System.err.println("Distribute: predavam spojeni");
             try {
                 Thread.sleep(10000);
                 
